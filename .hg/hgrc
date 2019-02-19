@@ -1,2 +1,3 @@
 [paths]
-default = git@github.com:scarabdesign/node-captcha.git
+default = /mnt/Rubenesque/repo/node-captcha
+github = https://github.com/scarabdesign/node-captcha.git

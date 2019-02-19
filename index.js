@@ -31,9 +31,10 @@ exports.ncemw = function ncemw(req, res, next){
 			return next(error);
 		res.nc = captObj;
 		res.nc.challengeResponse = {};
-		var submitCaptcha = req.param("node-cap_submit"),
-			challenge = req.param("node-cap_challenge"),
-			hash = req.param("node-cap_hash");
+		var submitCaptcha = req.body["node-cap_submit"],
+			challenge = req.body["node-cap_challenge"],
+			hash = req.body["node-cap_hash"];
+		
 		if(submitCaptcha && submitCaptcha == "true"){
 			validateCaptcha(challenge, hash, function(result){
 				res.nc.challengeResponse = result;
@@ -46,8 +47,8 @@ exports.ncemw = function ncemw(req, res, next){
 };
 
 exports.ncvalid = function ncvalid(req, res, next){
-	var challenge = req.param("node-cap_challenge"),
-		hash = req.param("node-cap_hash");
+	var challenge = req.body["node-cap_challenge"],
+		hash = req.body["node-cap_hash"];
 	res.nc = {
 		"challengeResponse": {}
 	};
@@ -59,7 +60,7 @@ exports.ncvalid = function ncvalid(req, res, next){
 
 exports.ncroutes = function ncroutes(app, express){
 		
-	app.get("/scripts", function(req, res){
+	app.get("/node-captcha/scripts.js", function(req, res){
 		fs.readFile(__dirname + "/lib/scripts.js", function(error, data){
 			if(error)
 				return res.send(error, 500);
@@ -67,7 +68,7 @@ exports.ncroutes = function ncroutes(app, express){
 		});
 	});
 	
-	app.get("/styles", function(req, res){
+	app.get("/node-captcha/styles.css", function(req, res){
 		fs.readFile(__dirname + "/lib/styles.css", function(error, data){
 			if(error)
 				return res.send(error, 500);
@@ -75,8 +76,8 @@ exports.ncroutes = function ncroutes(app, express){
 		});
 	});
 	
-	app.get("/refreshimage/:color?", function(req, res){
-		var color = req.param("color");
+	app.get("/node-captcha/refreshimage/:color?", function(req, res){
+		var color = req.query["color"];
 		nodeCaptcha.images("refreshimage", color, function(error, data){
 			if(error)
 				return res.send(error, 500);
@@ -84,7 +85,7 @@ exports.ncroutes = function ncroutes(app, express){
 		});
 	});
 	
-	app.get("/nodecaprefresh", function(req, res){
+	app.get("/node-captcha/nodecaprefresh", function(req, res){
 		var resultObj = {
 			"result": "unfinished",
 			"td": new Date().getTime()
@@ -112,9 +113,10 @@ exports.ncroutes = function ncroutes(app, express){
 		});
 	});
 	
-	app.post("/nodecapvalid", function(req, res){
-		var challenge = req.param("node-cap_challenge"),
-			hash = req.param("node-cap_hash");
+	app.post("/node-captcha/nodecapvalid", function(req, res){
+		var challenge = req.body["node-cap_challenge"],
+			hash = req.body["node-cap_hash"];
+		
 		validateCaptcha(challenge, hash, function(result){
 			res.send(JSON.stringify(result), { "Content-Type": "text/plain"}, 200);
 		});
